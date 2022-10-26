@@ -99,3 +99,25 @@ public struct TestListData
     [MarshalAs(UnmanagedType.R4)]
     public float m_float;
 }
+
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+[Serializable]
+public struct ElementData
+{
+    [MarshalAs(UnmanagedType.I4)]
+    public int m_int;
+    [MarshalAs(UnmanagedType.I2)]
+    public short m_short;
+    [MarshalAs(UnmanagedType.R4)]
+    public float m_float;
+}
+
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+[Serializable]
+public struct ElementListData
+{
+    [MarshalAs(UnmanagedType.I4)]
+    public int m_size;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
+    public ElementData[] m_list;
+}

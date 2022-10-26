@@ -5,27 +5,40 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Runtime.InteropServices;// Marshal 쓰기우함
+using System.IO;
 
 public enum E_PROTOCOL
 {
-    // 초기 필요 값
-    CRYPTOKEY,      // 초기 암복호화키 전송 신호
-    IDCREATE,       // 아이디 생성
+    CRYPTOKEY,
+    IDCREATE,
 
-    PLAYTYPE,       // 멀티 or 싱글 선택
-    WAIT,           // 멀티 대기
-    SINGLE_START,           // 싱글 시작
-    MULTI_HOST_START,       // 호스트(주체) 시작
-    MULTI_GUEST_START,      // 게스트(의존) 시작
+    PLAYTYPE,
+    WAIT,
+    SINGLE_START,
+    MULTI_HOST_START,
+    MULTI_GUEST_START,
 
-    SPAWN,
-    MOVE,
-    JUMP,
-    DODGE,
-    FIRE,
     LEAVE,
     EXIT,
+
+    PLAYER_SPAWN,
+    PLAYER_TRANSFORM,
+    PLAYER_JUMP,
+    PLAYER_DODGE,
+    PLAYER_FIRE,
+
+    NPC_SPAWN,
+    NPC_TRANSFORM,
+    NPC_UPDATEHP,
+    NPC_TRIGGER,
+    NPC_SKILL,
+
+    ITEM_SPAWN,
+    ITEM_DESPAWN,
+
+    TEST,
 };
+
 public class Session
 {
     #region 상수
@@ -86,7 +99,6 @@ public class Session
         {
             return false;
         }
-        
     }
 
     public void TreadEnd()
@@ -139,6 +151,38 @@ public class Session
         return l_tempCounter;
     }
     // 프로토콜과 데이터를 보내는 함수
+    public void Write<Data>(int _protocol, List<Data> _data)
+    {
+        byte[] sendBuffer = new byte[1024];
+        int offset = 0;
+        int size = 0;
+        // 프로토콜
+        offset += sizeof(int); // 사이즈 뒤로 프로토콜 4
+        Buffer.BlockCopy(BitConverter.GetBytes(_protocol), 0, sendBuffer, offset, sizeof(int));
+        size += sizeof(int);
+        // 패킷넘버
+        offset += sizeof(int);// 프로토콜 뒤로 패킷 넘버 8
+        Buffer.BlockCopy(BitConverter.GetBytes(SendPacketCountUp()), 0, sendBuffer, offset, sizeof(int));
+        size += sizeof(int);
+
+        offset += sizeof(int);// 패킷넘버 뒤에 리스트 사이즈
+        Buffer.BlockCopy(BitConverter.GetBytes(_data.Count), 0, sendBuffer, offset, sizeof(int));
+        size += sizeof(int);
+
+        offset += sizeof(int);// 리스트 사이즈 뒤에 구조체 리스트
+        for (int i= 0; i < _data.Count; i++)
+        {
+            Buffer.BlockCopy(StructToByteArray(_data[i]), 0, sendBuffer, offset, Marshal.SizeOf(typeof(Data)));
+            size += Marshal.SizeOf(typeof(Data));
+            offset += Marshal.SizeOf(typeof(Data));
+        }
+
+        // 사이즈 넣기
+        offset = 0;
+        Buffer.BlockCopy(BitConverter.GetBytes(size), 0, sendBuffer, offset, sizeof(int));
+        _sendQ.Enqueue(sendBuffer);
+        autoEvent.Set();
+    }
     public void Write<Data>(int _protocol, Data _data)
     {
         byte[] sendBuffer = new byte[1024];

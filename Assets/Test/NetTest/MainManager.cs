@@ -44,12 +44,12 @@ public class MainManager : MonoBehaviour
 
     void Start()
     {
-        m_network.Register(E_PROTOCOL.SPAWN, SpawnProcess);
-        m_network.Register(E_PROTOCOL.MOVE, MoveProcess);
+        m_network.Register(E_PROTOCOL.PLAYER_SPAWN, SpawnProcess);
+        m_network.Register(E_PROTOCOL.PLAYER_TRANSFORM, MoveProcess);
         m_network.Register(E_PROTOCOL.LEAVE, OutProcess);
-        m_network.Register(E_PROTOCOL.DODGE, DodgeProcess);
-        m_network.Register(E_PROTOCOL.JUMP, JumpProcess);
-        m_network.Register(E_PROTOCOL.FIRE, FireProcess);
+        m_network.Register(E_PROTOCOL.PLAYER_DODGE, DodgeProcess);
+        m_network.Register(E_PROTOCOL.PLAYER_JUMP, JumpProcess);
+        m_network.Register(E_PROTOCOL.PLAYER_FIRE, FireProcess);
 
         m_network.Initialize();
     }
@@ -93,15 +93,15 @@ public class MainManager : MonoBehaviour
 
         m_mainData.m_state = state;
 
-        m_network.Session.Write((int)E_PROTOCOL.MOVE, m_mainData);
+        m_network.Session.Write((int)E_PROTOCOL.PLAYER_TRANSFORM, m_mainData);
     }
     public void SendJump(int _id)
     {
-        m_network.Session.Write((int)E_PROTOCOL.JUMP, _id);
+        m_network.Session.Write((int)E_PROTOCOL.PLAYER_JUMP, _id);
     }
     public void SendDodge(int _id)
     {
-        m_network.Session.Write((int)E_PROTOCOL.DODGE, _id);
+        m_network.Session.Write((int)E_PROTOCOL.PLAYER_DODGE, _id);
     }
     public void SendFire(int _id, Vector3 _position, Vector3 _direction)
     {
@@ -115,7 +115,7 @@ public class MainManager : MonoBehaviour
         packetFireData.m_direction.y = _direction.y;
         packetFireData.m_direction.z = _direction.z;
 
-        m_network.Session.Write((int)E_PROTOCOL.FIRE, packetFireData);
+        m_network.Session.Write((int)E_PROTOCOL.PLAYER_FIRE, packetFireData);
     }
 
     const int m_SendTimeCounterF = 5;

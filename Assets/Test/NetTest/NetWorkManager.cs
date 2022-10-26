@@ -33,6 +33,7 @@ public class NetWorkManager
         m_NetWorkProcess.Add((int)E_PROTOCOL.MULTI_HOST_START, MultiProcess);
         m_NetWorkProcess.Add((int)E_PROTOCOL.MULTI_GUEST_START, MultiProcess);
     }
+
     public void Register(E_PROTOCOL _protocol, Action _action)
     {
         if (m_NetWorkProcess.ContainsKey((int)_protocol) == false)
@@ -56,7 +57,7 @@ public class NetWorkManager
     private void SingleProcess()
     {
         session.GetData();
-        session.Write((int)E_PROTOCOL.SPAWN); // 스폰요청
+        session.Write((int)E_PROTOCOL.PLAYER_SPAWN); // 스폰요청
     }
 
     private void WaitProcess()
@@ -67,7 +68,7 @@ public class NetWorkManager
     private void MultiProcess()
     {
         session.GetData();
-        session.Write((int)E_PROTOCOL.SPAWN); // 스폰요청
+        session.Write((int)E_PROTOCOL.PLAYER_SPAWN); // 스폰요청
     }
 
     public void End()
